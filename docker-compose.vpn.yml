@@ -19,6 +19,8 @@ services:
     volumes:
       - /dev/net:/dev/net:z
       - ./packages/vpn:/vpn
+      - ./packages/vpn/vpn-up.sh:/etc/openvpn/vpn-up.sh
+      - ./packages/vpn/vpn-down.sh:/etc/openvpn/vpn-down.sh
     entrypoint: "bash -c"
     command: "exit 0"
     restart: always

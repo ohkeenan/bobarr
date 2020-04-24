@@ -45,4 +45,4 @@ def print_test():
     return ("", 200, None)
 
 if __name__ == '__main__':
-    app.run(debug=False, use_reloader=True)
+    app.run(host='0.0.0.0',debug=False, use_reloader=True)
