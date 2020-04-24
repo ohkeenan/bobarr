@@ -58,7 +58,8 @@ services:
       - 9117:9117
 
   transmission:
-    image: linuxserver/transmission
+    build:
+      context: ./packages/transmission
     container_name: bobarr-transmission
     env_file: .env
     restart: unless-stopped
