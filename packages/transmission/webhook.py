@@ -2,10 +2,26 @@
 """
 Simple webhook listener for stopping processes
 """
-
+import subprocess
 from flask import Flask, request
 
 app = Flask(__name__)
+
+
+def parse_request(req):
+    """
+    Parses application/json request body data into a Python dictionary
+    """
+    payload = req.get_json()
+    return payload
+
+def perform_action(action, dirname, pname):
+    """
+    Action
+    """
+    doaction = subprocess.run(["./s6-action.sh", action, dirname, pname], universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return(doaction.stderr)
+
 
 @app.route('/', methods=['GET'])
 def index():
@@ -15,25 +31,15 @@ def index():
 @app.route('/killswitch', methods=['POST'])
 def print_test():
     """
-    Send a POST request to bobarr-transmission:5000/killswitch
-    OR localhost:5000/killswitch (with a JSON body with "action" key, value "kill" or "revive"
+    Send a POST request to localhost:5000/killswitch (with a JSON body with "action" key, value "kill" or "start"
     """
-    payload = request.get_json()
+    payload = parse_request(request)
 
-    if 'action' not in payload:
-        return("No action in payload", 400, None)
-
-    elif payload['action'] == 'kill':
-        print("Action is kill")
-        return("Killed Transmission", 200, None)
-
-    elif payload['action'] == 'revive':
-        print("Action is revive")
-        return("Re/vived Transmission", 200, None)
-
+    if 'action' and 'dirname' and 'pname' in payload:
+        doaction = perform_action(payload['action'], payload['dirname'], payload['pname'])
+        return(doaction, 200, None)
     else:
-        print("Action is unknown")
-        return("Action not recognized")
+        return("Missing action, dirname, or pname key(s)", 400, None)
 
     print(payload)
     return ("", 200, None)
